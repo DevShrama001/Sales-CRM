@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2 class="mb-4">Dashboard</h2>
+
+    <!-- Lead Statistics -->
+    <div class="row mb-4">
+        {% for status, count in leads_by_status.items() %}
+        <div class="col-md-3 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ status }}</h5>
+                    <h2 class="card-text">{{ count }}</h2>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="row">
+        <!-- Recent Leads -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Leads</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for lead in recent_leads %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ lead.name }}</h6>
+                                <small class="text-muted">{{ lead.created_at.strftime('%Y-%m-%d') }}</small>
+                            </div>
+                            <p class="mb-1">{{ lead.company }}</p>
+                            <small class="text-muted">Status: {{ lead.status }}</small>
+                        </div>
+                        {% else %}
+                        <div class="list-group-item">
+                            <p class="mb-0">No recent leads</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('manage_leads') }}" class="btn btn-primary btn-sm">View All Leads</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Follow-ups -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Upcoming Follow-ups</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for followup in upcoming_followups %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ followup.lead.name }}</h6>
+                                <small class="text-muted">{{ followup.followup_date.strftime('%Y-%m-%d %H:%M') }}</small>
+                            </div>
+                            <p class="mb-1">{{ followup.notes }}</p>
+                            <small class="text-muted">Status: {{ followup.status }}</small>
+                        </div>
+                        {% else %}
+                        <div class="list-group-item">
+                            <p class="mb-0">No upcoming follow-ups</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('followup_leads') }}" class="btn btn-primary btn-sm">View All Follow-ups</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex gap-2">
+                        <a href="{{ url_for('add_lead') }}" class="btn btn-primary">
+                            <i class="fas fa-plus-circle"></i> Add New Lead
+                        </a>
+                        <a href="{{ url_for('manage_leads') }}" class="btn btn-secondary">
+                            <i class="fas fa-tasks"></i> Manage Leads
+                        </a>
+                        <a href="{{ url_for('followup_leads') }}" class="btn btn-info">
+                            <i class="fas fa-phone"></i> Follow Up Leads
+                        </a>
+                        {% if current_user.is_admin %}
+                        <a href="{{ url_for('manage_staff') }}" class="btn btn-dark">
+                            <i class="fas fa-users"></i> Manage Staff
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add any dashboard-specific JavaScript here
+});
+</script>
+{% endblock %}

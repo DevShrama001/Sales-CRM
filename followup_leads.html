@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Follow-up Leads</h2>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addFollowupModal">
+            <i class="fas fa-plus-circle"></i> Add Follow-up
+        </button>
+    </div>
+
+    <!-- Follow-up Calendar -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div id="followupCalendar"></div>
+        </div>
+    </div>
+
+    <!-- Follow-up List -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Upcoming Follow-ups</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Lead</th>
+                            <th>Follow-up Date</th>
+                            <th>Notes</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for followup in followups %}
+                        <tr>
+                            <td>
+                                <strong>{{ followup.lead.name }}</strong><br>
+                                <small class="text-muted">{{ followup.lead.company }}</small>
+                            </td>
+                            <td>{{ followup.followup_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>{{ followup.notes }}</td>
+                            <td>
+                                <span class="badge {% if followup.status == 'Pending' %}bg-warning{% elif followup.status == 'Completed' %}bg-success{% else %}bg-danger{% endif %}">
+                                    {{ followup.status }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-outline-primary" 
+                                            onclick="editFollowup({{ followup.id }})">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-success" 
+                                            onclick="completeFollowup({{ followup.id }})">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" 
+                                            onclick="deleteFollowup({{ followup.id }})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center">No follow-ups scheduled</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Follow-up Modal -->
+<div class="modal fade" id="followupModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Schedule Follow-up</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="followupForm">
+                    <input type="hidden" id="followupId">
+                    <div class="mb-3">
+                        <label for="leadSelect" class="form-label">Lead</label>
+                        <select class="form-select" id="leadSelect" required>
+                            {% for lead in leads %}
+                            <option value="{{ lead.id }}">{{ lead.name }} - {{ lead.company }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="followupDate" class="form-label">Follow-up Date & Time</label>
+                        <input type="datetime-local" class="form-control" id="followupDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="followupNotes" class="form-label">Notes</label>
+                        <textarea class="form-control" id="followupNotes" rows="3" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveFollowup()">Save Follow-up</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+<script src="{{ url_for('static', filename='js/followup_leads.js') }}"></script>
+{% endblock %}
